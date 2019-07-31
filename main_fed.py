@@ -24,7 +24,7 @@ if __name__ == '__main__':
     args = args_parser()
     
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
-    args.device = 'cpu'
+#    args.device = 'cpu'
     print(args.device)
     # load dataset and split users
     if args.dataset == 'mnist':
