@@ -21,9 +21,9 @@ from models.test import test_img
 if __name__ == '__main__':
     # parse args
     args = args_parser()
-    #'cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else
+    
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
-    args.device = 'cpu'
+#    args.device = 'cpu'
     print(args.device)
     # load dataset and split users
     if args.dataset == 'mnist':
@@ -97,12 +97,11 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
-    plt.savefig('./log/fed_{}_{}_{}_C{}_iid{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid))
+    plt.savefig('./log/fed_{}_{}_{}_C{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep))
 
 
 
     # testing
-    net_glob.eval()
     acc_train, loss_train = test_img(net_glob, dataset_train, args)
     acc_test, loss_test = test_img(net_glob, dataset_test, args)
     print("Training accuracy: {}".format(acc_train))

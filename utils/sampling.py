@@ -33,13 +33,10 @@ def mnist_noniid(dataset, num_users):
     dict_users = {i: np.array([], dtype='int64') for i in range(num_users)}
     idxs = np.arange(num_shards*num_imgs)
     labels = dataset.targets.numpy()
-    print(labels.shape,idxs.shape)
     # sort labels
     idxs_labels = np.vstack((idxs, labels))
     idxs_labels = idxs_labels[:,idxs_labels[1,:].argsort()]
     idxs = idxs_labels[0,:]
-    print(idxs)
-    print("zaa")
     # divide and assign
     for i in range(num_users):
         rand_set = set(np.random.choice(idx_shard, 2, replace=False))
@@ -69,17 +66,12 @@ def cifar_noniid(dataset, num_users):
     idx_shard = [i for i in range(num_shards)]
     dict_users = {i: np.array([], dtype='int64') for i in range(num_users)}
     idxs = np.arange(num_shards*num_imgs)
-    print(idxs)
-    #labels = dataset.targets.numpy()
+    #labels = dataset.targets.numpy() it does not work for some reason
     labels = np.asarray(dataset.targets, dtype=np.int32)
-    print(labels.shape,idxs.shape)
     # sort labels
     idxs_labels = np.vstack((idxs, labels))
     idxs_labels = idxs_labels[:,idxs_labels[1,:].argsort()]
-    print(idxs_labels)
     idxs = idxs_labels[0 , :]
-    print(idxs)
-    print("labels for cifar noniid")
     # divide and assign
     for i in range(num_users):
         rand_set = set(np.random.choice(idx_shard, 2, replace=False))
