@@ -13,7 +13,8 @@ import torch
 from utils.sampling import mnist_iid, mnist_noniid, cifar_iid, cifar_noniid
 from utils.options import args_parser
 from models.Update import LocalUpdate
-from models.Nets import MLP, CNNMnist, CNNCifar
+from models.Nets import *
+#MLP, CNNMnist, CNNCifar
 from models.Fed import FedAvg
 from models.test import test_img
 
@@ -23,7 +24,7 @@ if __name__ == '__main__':
     args = args_parser()
     
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
-#    args.device = 'cpu'
+    args.device = 'cpu'
     print(args.device)
     # load dataset and split users
     if args.dataset == 'mnist':
@@ -57,6 +58,8 @@ if __name__ == '__main__':
         for x in img_size:
             len_in *= x
         net_glob = MLP(dim_in=len_in, dim_hidden=64, dim_out=args.num_classes).to(args.device)
+    elif args.model == 'resnet':
+        net_glob = resnet56().to(args.device)    
     else:
         exit('Error: unrecognized model')
     print(net_glob)

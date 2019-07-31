@@ -13,8 +13,8 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 
 from utils.options import args_parser
-from models.Nets import MLP, CNNMnist, CNNCifar
-
+from models.Nets import *
+#MLP, CNNMnist, CNNCifar
 
 def test(net_g, data_loader):
     # testing
@@ -74,6 +74,8 @@ if __name__ == '__main__':
         for x in img_size:
             len_in *= x
         net_glob = MLP(dim_in=len_in, dim_hidden=64, dim_out=args.num_classes).to(args.device)
+    elif args.model == 'resnet':
+        net_glob = resnet56().to(args.device)
     else:
         exit('Error: unrecognized model')
     print(net_glob)
