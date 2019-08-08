@@ -23,7 +23,7 @@ if __name__ == '__main__':
     args = args_parser()
     
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
-    #args.device = 'cpu'
+    args.device = 'cpu'
     print(args.device)
     # load dataset and split users
     if args.dataset == 'mnist':
@@ -32,17 +32,17 @@ if __name__ == '__main__':
         dataset_test = datasets.MNIST('../data/mnist/', train=False, download=True, transform=trans_mnist)
         # sample users
         if args.iid:
-            dict_users = mnist_iid(dataset_train, args.num_users)
+            dict_users,valid_set = mnist_iid(dataset_train, args.num_users)
         else:
-            dict_users = mnist_noniid(dataset_train, args.num_users)
+            dict_users,valid_set = mnist_noniid(dataset_train, args.num_users)
     elif args.dataset == 'cifar':
         trans_cifar = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
         dataset_train = datasets.CIFAR10('../data/cifar', train=True, download=True, transform=trans_cifar)
         dataset_test = datasets.CIFAR10('../data/cifar', train=False, download=True, transform=trans_cifar)
         if args.iid:
-            dict_users = cifar_iid(dataset_train, args.num_users)
+            dict_users,valid_set = cifar_iid(dataset_train, args.num_users)
         else:
-            dict_users = cifar_noniid(dataset_train, args.num_users)
+            dict_users,valid_set = cifar_noniid(dataset_train, args.num_users)
     else:
         exit('Error: unrecognized dataset')
     img_size = dataset_train[0][0].shape
