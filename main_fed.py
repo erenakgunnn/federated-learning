@@ -13,8 +13,7 @@ import torch
 from utils.sampling import mnist_iid, mnist_noniid, cifar_iid, cifar_noniid
 from utils.options import args_parser
 from models.Update import LocalUpdate
-from models.Nets import *
-#MLP, CNNMnist, CNNCifar
+from models.Nets import MLP, CNNMnist, CNNCifar, ResNet, resnet50
 from models.Fed import FedAvg
 from models.test import test_img
 
@@ -24,13 +23,14 @@ if __name__ == '__main__':
     args = args_parser()
     
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
-#    args.device = 'cpu'
+    args.device = 'cpu'
     print(args.device)
     # load dataset and split users
     if args.dataset == 'mnist':
         trans_mnist = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))])
         dataset_train = datasets.MNIST('../data/mnist/', train=True, download=True, transform=trans_mnist)
         dataset_test = datasets.MNIST('../data/mnist/', train=False, download=True, transform=trans_mnist)
+        print('train dataset`i {}'.format(dataset_train))
         # sample users
         if args.iid:
             dict_users = mnist_iid(dataset_train, args.num_users)
@@ -59,7 +59,7 @@ if __name__ == '__main__':
             len_in *= x
         net_glob = MLP(dim_in=len_in, dim_hidden=64, dim_out=args.num_classes).to(args.device)
     elif args.model == 'resnet':
-        net_glob = resnet56().to(args.device)    
+        net_glob = resnet50(pretrained=True, ).to(args.device)    
     else:
         exit('Error: unrecognized model')
     print(net_glob)
@@ -78,8 +78,8 @@ if __name__ == '__main__':
 
     for iter in range(args.epochs):
         w_locals, loss_locals = [], []
-        m = max(int(args.frac * args.num_users), 1)
-        idxs_users = np.random.choice(range(args.num_users), m, replace=False)
+        m = max(int(args.frac * args.num_users), 1) #her iletisim oncesi client yuzdesi ayarlanabilir
+        idxs_users = np.random.choice(range(args.num_users), m, replace=False) #her iletisim oncesi farli random kullanicilar
         for idx in idxs_users:
             local = LocalUpdate(args=args, dataset=dataset_train, idxs=dict_users[idx])
             w, loss = local.train(net=copy.deepcopy(net_glob).to(args.device))
@@ -100,12 +100,12 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
-    plt.savefig('federated-learning/log/fed_{}_{}_{}_C{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep))
+    plt.savefig('./log/fed_{}_{}_{}_C{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep))
 
 
 
     # testing
     acc_train, loss_train = test_img(net_glob, dataset_train, args)
     acc_test, loss_test = test_img(net_glob, dataset_test, args)
-    print("Training accuracy: {}".format(acc_train))
-    print("Testing accuracy: {}".format(acc_test))
+    print("Training accuracy: {:.2f}".format(acc_train))
+    print("Testing accuracy: {:.2f}".format(acc_test))
