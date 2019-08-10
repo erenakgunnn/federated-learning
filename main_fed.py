@@ -12,10 +12,10 @@ import torch
 
 from utils.sampling import mnist_iid, mnist_noniid, cifar_iid, cifar_noniid
 from utils.options import args_parser
-from models.Update import LocalUpdate
+from models.Update import LocalUpdate,DatasetSplit
 from models.Nets import MLP, CNNMnist, CNNCifar,resnet56
-from models.Fed import FedAvg
-from models.test import test_img
+from models.Fed import FedAvg, MomentAvg
+from models.test import test_img, LocalAcc
 
 
 if __name__ == '__main__':
@@ -32,17 +32,17 @@ if __name__ == '__main__':
         dataset_test = datasets.MNIST('../data/mnist/', train=False, download=True, transform=trans_mnist)
         # sample users
         if args.iid:
-            dict_users,valid_set = mnist_iid(dataset_train, args.num_users)
+            dict_users,valid_idxs = mnist_iid(dataset_train, args.num_users)
         else:
-            dict_users,valid_set = mnist_noniid(dataset_train, args.num_users)
+            dict_users,valid_idxs = mnist_noniid(dataset_train, args.num_users)
     elif args.dataset == 'cifar':
         trans_cifar = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
         dataset_train = datasets.CIFAR10('../data/cifar', train=True, download=True, transform=trans_cifar)
         dataset_test = datasets.CIFAR10('../data/cifar', train=False, download=True, transform=trans_cifar)
         if args.iid:
-            dict_users,valid_set = cifar_iid(dataset_train, args.num_users)
+            dict_users,valid_idxs = cifar_iid(dataset_train, args.num_users)
         else:
-            dict_users,valid_set = cifar_noniid(dataset_train, args.num_users)
+            dict_users,valid_idxs = cifar_noniid(dataset_train, args.num_users)
     else:
         exit('Error: unrecognized dataset')
     img_size = dataset_train[0][0].shape
@@ -74,9 +74,12 @@ if __name__ == '__main__':
     net_best = None
     best_loss = None
     val_acc_list, net_list = [], []
+    
+    #create validation set
+    valid_set = DatasetSplit(dataset_train,valid_idxs)
 
     for iter in range(args.epochs):
-        w_locals, loss_locals = [], []
+        w_locals, loss_locals, client_acc, momentums = [], [], [], []
         m = max(int(args.frac * args.num_users), 1)
         idxs_users = np.random.choice(range(args.num_users), m, replace=False)
         for idx in idxs_users:
@@ -84,8 +87,15 @@ if __name__ == '__main__':
             w, loss = local.train(net=copy.deepcopy(net_glob).to(args.device))
             w_locals.append(copy.deepcopy(w))
             loss_locals.append(copy.deepcopy(loss))
-        # update global weights
-        w_glob = FedAvg(w_locals)
+        
+        if args.client_momentum:
+            #calculate accuracies
+            client_acc, momentums = LocalAcc(args,w_locals, valid_set, net=copy.deepcopy(net_glob).to(args.device))
+            print(client_acc,momentums)
+            w_glob = MomentAvg(momentums,w_locals)
+        else:
+            # update global weights
+            w_glob = FedAvg(w_locals)
 
         # copy weight to net_glob
         net_glob.load_state_dict(w_glob)
@@ -99,7 +109,7 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
-    plt.savefig('federated-learning/log/fed_{}_{}_{}_C{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep))
+    plt.savefig('./log/fed_{}_{}_{}_C{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep))
 
 
 
