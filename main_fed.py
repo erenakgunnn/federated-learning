@@ -23,7 +23,7 @@ if __name__ == '__main__':
     args = args_parser()
     
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
-    args.device = 'cpu'
+    #args.device = 'cpu'
     print(args.device)
     # load dataset and split users
     if args.dataset == 'mnist':
@@ -109,7 +109,7 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
-    plt.savefig('./log/fed_{}_{}_{}_C{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep))
+    plt.savefig('federated-learning/log/fed_{}_{}_{}_C{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep))
 
 
 
