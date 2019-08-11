@@ -1,4 +1,3 @@
-%%writefile federated-learning/main_fed.py
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Python version: 3.6
