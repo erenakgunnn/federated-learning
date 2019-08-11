@@ -43,7 +43,13 @@ def LocalAcc(args,w_locals,valid_set, net):
     #find normalized accuracies
     momentums = []
     total = 0
+    """
     for i in accuracy:
         total+=i**2
-    momentums = [i**2/total for i in accuracy]
+        momentums = [i**2/total for i in accuracy]"""
+    
+    for i in accuracy:
+        total+=i
+        momentums = [i/total for i in accuracy]
+
     return accuracy, momentums

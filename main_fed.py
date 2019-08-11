@@ -1,3 +1,4 @@
+%%writefile federated-learning/main_fed.py
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Python version: 3.6
@@ -99,10 +100,11 @@ if __name__ == '__main__':
 
         # copy weight to net_glob
         net_glob.load_state_dict(w_glob)
-
+        acc_test, loss_test = test_img(net_glob, dataset_test, args)
+        val_acc_list.append(acc_test)
         # print loss
         loss_avg = sum(loss_locals) / len(loss_locals)
-        print('Round {:3d}, Average loss {:.3f}'.format(iter, loss_avg))
+        print('Round {:3d}, Average loss {:.3f}, Accuracy {}'.format(iter, loss_avg, val_acc_list[iter]))
         loss_train.append(loss_avg)
 
     # plot loss curve
@@ -110,6 +112,11 @@ if __name__ == '__main__':
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
     plt.savefig('federated-learning/log/fed_{}_{}_{}_C{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep))
+    
+    plt.figure()
+    plt.plot(range(len(val_acc_list)), val_acc_list)
+    plt.ylabel('test_accuracy')
+    plt.savefig('federated-learning/log/accuracy_{}_{}_{}_C{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep))
 
 
 
@@ -118,3 +125,4 @@ if __name__ == '__main__':
     acc_test, loss_test = test_img(net_glob, dataset_test, args)
     print("Training accuracy: {}".format(acc_train))
     print("Testing accuracy: {}".format(acc_test))
+    print("All test accuracies: {}".format(val_acc_list))
