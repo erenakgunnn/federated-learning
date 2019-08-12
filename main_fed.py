@@ -19,7 +19,7 @@ from models.test import test_img, LocalAcc
 
 
 if __name__ == '__main__':
-    # parse args
+    # parse args, al sana push
     args = args_parser()
     
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
