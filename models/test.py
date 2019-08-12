@@ -6,6 +6,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
+import numpy as np
 
 
 def test_img(net_g, datatest, args):
@@ -46,10 +47,11 @@ def LocalAcc(args,w_locals,valid_set, net):
     """
     for i in accuracy:
         total+=i**2
-        momentums = [i**2/total for i in accuracy]"""
+    momentums = [i**2/total for i in accuracy]
+    """
     
     for i in accuracy:
-        total+=i
-        momentums = [i/total for i in accuracy]
+        total+=i    
+    momentums = [i/total for i in accuracy]
 
     return accuracy, momentums
