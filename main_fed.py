@@ -122,7 +122,7 @@ if __name__ == '__main__':
     # testing
     acc_train, loss_train = test_img(net_glob, dataset_train, args)
     acc_test, loss_test = test_img(net_glob, dataset_test, args)
-    print("Training accuracy: {}".format(acc_train))
+    print("Trainingg accuracy: {}".format(acc_train))
     print("Testing accuracy: {}".format(acc_test))
     print("All test accuracies: {}".format(val_acc_list))
 

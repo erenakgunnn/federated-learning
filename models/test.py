@@ -51,7 +51,7 @@ def LocalAcc(args,w_locals,valid_set, net):
     """
     
     for i in accuracy:
-        total+=i    
-    momentums = [i/total for i in accuracy]
+        total+=np.exp(i)    
+    momentums = [np.exp(i)/total for i in accuracy]
 
     return accuracy, momentums
