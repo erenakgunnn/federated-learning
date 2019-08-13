@@ -115,9 +115,8 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(range(len(val_acc_list)), val_acc_list)
     plt.ylabel('test_accuracy')
-    plt.savefig('federated-learning/log/accuracy_{}_{}_{}_C{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep))
-
-
+    plt.xlabel("epoch")
+    plt.savefig('federated-learning/log/accuracy_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep))
 
     # testing
     acc_train, loss_train = test_img(net_glob, dataset_train, args)
@@ -125,3 +124,11 @@ if __name__ == '__main__':
     print("Training accuracy: {}".format(acc_train))
     print("Testing accuracy: {}".format(acc_test))
     print("All test accuracies: {}".format(val_acc_list))
+
+    #writing to txt file
+    text_logs = open("federated-learning/log/text_log.txt","a")
+    text_logs.write('--dataset:"{}"  model:"{}"  epochs:{}  local epochs:{}  fraciton:{}  number of user:{}  iid:{}  client momentum:{} \n'.format(args.dataset, args.model, args.epochs, args.local_ep, args.frac,args.num_users, args.iid, args.client_momentum))
+    text_logs.write('train accuracy: {} test accuracy: {} final train loss: {} final test loss: {}\n\n'.format(acc_train,acc_test,loss_train,loss_test))
+
+
+
