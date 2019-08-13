@@ -103,6 +103,7 @@ if __name__ == '__main__':
         val_acc_list.append(acc_test)
         # print loss
         loss_avg = sum(loss_locals) / len(loss_locals)
+        print(idxs_users)
         print('Round {:3d}, Average loss {:.3f}, Accuracy {}'.format(iter, loss_avg, val_acc_list[iter]))
         loss_train.append(loss_avg)
 
