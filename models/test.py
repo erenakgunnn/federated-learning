@@ -7,6 +7,7 @@ from torch import nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import numpy as np
+import scipy.stats as sci
 
 
 def test_img(net_g, datatest, args):
@@ -42,16 +43,24 @@ def LocalAcc(args,w_locals,valid_set, net):
         acc , test_loss = test_img(net,valid_set,args)
         accuracy.append(acc)
     #find normalized accuracies
-    momentums = []
-    total = 0
-    """
-    for i in accuracy:
-        total+=i**2
-    momentums = [i**2/total for i in accuracy]
-    """
-    
-    for i in accuracy:
-        total+=np.exp(i)    
-    momentums = [np.exp(i)/total for i in accuracy]
+    if args.client_momentum:
+        momentums = []
+        total = 0
+        """
+        for i in accuracy:
+            total+=i**2
+        momentums = [i**2/total for i in accuracy]
+        """
+        
+        for i in accuracy:
+            total+=np.exp(i)    
+        momentums = [np.exp(i)/total for i in accuracy]
+        return accuracy, momentums
 
-    return accuracy, momentums
+    elif args.client_prob:
+        increments = sci.zscore(accuracy)
+        increments = np.asarray(increments)*0.1/args.num_users
+        return accuracy, list(increments)
+    else:
+        print("An error occured")
+        return accuracy, momentums
