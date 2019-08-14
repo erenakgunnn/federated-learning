@@ -23,7 +23,7 @@ if __name__ == '__main__':
     args = args_parser()
     
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
-    args.device = 'cpu'
+    #args.device = 'cpu'
     print(args.device)
     # load dataset and split users
     if args.dataset == 'mnist':
@@ -75,6 +75,7 @@ if __name__ == '__main__':
     best_loss = None
     val_acc_list, net_list = [], []
     client_prob = [1/args.num_users]*args.num_users
+    client_freq = [0]*args.num_users
     
     #create validation set
     valid_set = DatasetSplit(dataset_train,valid_idxs)
@@ -98,7 +99,7 @@ if __name__ == '__main__':
             client_acc, prob_increment = LocalAcc(args,w_locals, valid_set, net=copy.deepcopy(net_glob).to(args.device))
             print("client acc: ",client_acc)
             print("prob_increments: ", prob_increment)
-            prob_update(idxs_users,client_prob,prob_increment)
+            prob_update(idxs_users,client_prob,prob_increment,client_freq)
             w_glob = FedAvg(w_locals)
 
         else:
@@ -113,6 +114,7 @@ if __name__ == '__main__':
         loss_avg = sum(loss_locals) / len(loss_locals)
         print("user idxs: ",idxs_users)
         print("user probabilities: ",client_prob)
+        print("user freqs: ", client_freq)
         print('Round {:3d}, Average loss {:.3f}, Accuracy {}'.format(iter, loss_avg, val_acc_list[iter]))
         loss_train.append(loss_avg)
 
@@ -120,13 +122,13 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
-    plt.savefig('./log/fed_{}_{}_{}_C{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep))
+    plt.savefig('federated-learning/log/fed_{}_{}_{}_C{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep))
     
     plt.figure()
     plt.plot(range(len(val_acc_list)), val_acc_list)
     plt.ylabel('test_accuracy')
     plt.xlabel("epoch")
-    plt.savefig('./log/accuracy_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep))
+    plt.savefig('federated-learning/log/accuracy_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}.png'.format(args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep))
 
     # testing
     acc_train, loss_train = test_img(net_glob, dataset_train, args)
@@ -136,7 +138,7 @@ if __name__ == '__main__':
     print("All test accuracies: {}".format(val_acc_list))
 
     #writing to txt file
-    text_logs = open("./log/text_log.txt","a")
+    text_logs = open("federated-learning/log/text_log.txt","a")
     text_logs.write('--dataset:"{}"  model:"{}"  epochs:{}  local epochs:{}  fraciton:{}  number of user:{}  iid:{}  client momentum:{} client prob:{} \n'.format(args.dataset, args.model, args.epochs, args.local_ep, args.frac,args.num_users, args.iid, args.client_momentum,args.client_prob))
     text_logs.write('train accuracy: {} test accuracy: {} final train loss: {} final test loss: {}\n\n'.format(acc_train,acc_test,loss_train,loss_test))
 
