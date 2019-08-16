@@ -122,13 +122,13 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
-    plt.savefig('federated-learning/log/fed_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}_ClMom{}_ClProb{}_mixed{}.png'.format(args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep,args.client_momentum,args.client_prob,args._mixed))
+    plt.savefig('federated-learning/log/fed_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}_ClMom{}_ClProb{}_mixed{}.png'.format(args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep,args.client_momentum,args.client_prob,args.mixed))
     
     plt.figure()
     plt.plot(range(len(val_acc_list)), val_acc_list)
     plt.ylabel('test_accuracy')
     plt.xlabel("epoch")
-    plt.savefig('federated-learning/log/accuracy_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}_ClMom{}_ClProb{}_mixed{}.png'.format(args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep,args.client_momentum,args.client_prob,args._mixed))
+    plt.savefig('federated-learning/log/accuracy_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}_ClMom{}_ClProb{}_mixed{}.png'.format(args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep,args.client_momentum,args.client_prob,args.mixed))
 
     # testing
     acc_train, loss_train = test_img(net_glob, dataset_train, args)
