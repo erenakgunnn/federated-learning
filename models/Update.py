@@ -53,7 +53,11 @@ class LocalUpdate(object):
             epoch_loss.append(sum(batch_loss)/len(batch_loss))
         return net.state_dict(), sum(epoch_loss) / len(epoch_loss)
 
-def prob_update(idxs_users,client_prob,prob_increment,client_freq):
+def prob_update(idxs_users,client_prob,prob_increment,client_freq, args):
+    all = set([i for i in range(args.num_users)])-set(idxs_users)
     for i in range(len(prob_increment)):
-        client_prob[idxs_users[i]]+=prob_increment[i]
+        client_prob[idxs_users[i]]+=(prob_increment[i] - 0.0005)
         client_freq[idxs_users[i]]+=1
+    for x in list(all):
+        client_prob[x] += 0.0005/9     
+         

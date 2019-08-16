@@ -99,7 +99,7 @@ if __name__ == '__main__':
             client_acc, prob_increment = LocalAcc(args,w_locals, valid_set, net=copy.deepcopy(net_glob).to(args.device))
             print("client acc: ",client_acc)
             print("prob_increments: ", prob_increment)
-            prob_update(idxs_users,client_prob,prob_increment,client_freq)
+            prob_update(idxs_users,client_prob,prob_increment,client_freq, args)
             w_glob = FedAvg(w_locals)
 
         else:
