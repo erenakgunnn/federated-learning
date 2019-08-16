@@ -38,6 +38,7 @@ def args_parser():
     parser.add_argument('--seed', type=int, default=1, help='random seed (default: 1)')
     parser.add_argument('--client_momentum', action='store_true', help='smart client selection with momentum')
     parser.add_argument('--client_prob', action='store_true', help='smart client selection with varying probability')
+    parser.add_argument('--mixed', type=float, default=0.0, help='the ratio of the clients with IID data in NON_IID setting')  
 
     args = parser.parse_args()
     return args
