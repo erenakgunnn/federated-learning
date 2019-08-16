@@ -23,7 +23,7 @@ if __name__ == '__main__':
     args = args_parser()
     
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
-    #args.device = 'cpu'
+    args.device = 'cpu'
     print(args.device)
     # load dataset and split users
     if args.dataset == 'mnist':
@@ -74,8 +74,9 @@ if __name__ == '__main__':
     net_best = None
     best_loss = None
     val_acc_list, net_list = [], []
-    client_prob = [1/args.num_users]*args.num_users
+    client_prob = [0.01]*args.num_users
     client_freq = [0]*args.num_users
+    client_rank = [0]*args.num_users
     
     #create validation set
     valid_set = DatasetSplit(dataset_train,valid_idxs)
@@ -96,10 +97,10 @@ if __name__ == '__main__':
             print(client_acc,momentums)
             w_glob = MomentAvg(momentums,w_locals)
         elif args.client_prob:
-            client_acc, prob_increment = LocalAcc(args,w_locals, valid_set, net=copy.deepcopy(net_glob).to(args.device))
+            client_acc, rank_increment = LocalAcc(args,w_locals, valid_set, net=copy.deepcopy(net_glob).to(args.device))
             print("client acc: ",client_acc)
-            print("prob_increments: ", prob_increment)
-            prob_update(idxs_users,client_prob,prob_increment,client_freq, args)
+            print("rank_increments: ", rank_increment)
+            prob_update(idxs_users,client_prob,client_rank,rank_increment,client_freq, args)
             w_glob = FedAvg(w_locals)
 
         else:

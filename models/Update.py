@@ -53,11 +53,25 @@ class LocalUpdate(object):
             epoch_loss.append(sum(batch_loss)/len(batch_loss))
         return net.state_dict(), sum(epoch_loss) / len(epoch_loss)
 
-def prob_update(idxs_users,client_prob,prob_increment,client_freq, args):
+def lineer_prob(scores):
+  return scores/sum(scores)
+
+def sigmoid(x):
+    a = []
+    for i in x:
+        a.append(1/(1+np.exp(-i)))
+    return a
+
+def prob_update(idxs_users,client_prob,client_rank,rank_increment,client_freq, args):
     all = set([i for i in range(args.num_users)])-set(idxs_users)
-    for i in range(len(prob_increment)):
-        client_prob[idxs_users[i]]+=(prob_increment[i] - 0.0005)
+    for i in range(len(rank_increment)):
+        client_rank[idxs_users[i]]+=(rank_increment[i] - 0.125)
         client_freq[idxs_users[i]]+=1
     for x in list(all):
-        client_prob[x] += 0.0005/9     
+        client_rank[x] += 0.125/9
+    temp_list = sigmoid(client_rank)
+    total = sum(temp_list)
+    for i in range(len(client_prob)):
+        client_prob[i] = temp_list[i]/total
+
          

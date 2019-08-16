@@ -59,7 +59,7 @@ def LocalAcc(args,w_locals,valid_set, net):
 
     elif args.client_prob:
         increments = sci.zscore(accuracy)
-        increments = np.asarray(increments)*0.1/args.num_users
+        increments = np.asarray(increments)/4
         return accuracy, list(increments)
     else:
         print("An error occured")
