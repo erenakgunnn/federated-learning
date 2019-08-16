@@ -141,5 +141,5 @@ if __name__ == '__main__':
     text_logs = open("federated-learning/log/text_log.txt","a")
     text_logs.write('--dataset:"{}"  model:"{}"  epochs:{}  local epochs:{}  fraciton:{}  number of user:{}  iid:{}  client momentum:{} client prob:{} mixed:{}\n'.format(args.dataset, args.model, args.epochs, args.local_ep, args.frac,args.num_users, args.iid, args.client_momentum,args.client_prob,args.mixed))
     text_logs.write('Accuracies during training:"{}" \n'.format(val_acc_list))
-    text_logs.write("Frequencies of IID users: {}".format(client_freq[0:20]))
+    text_logs.write("Frequencies of IID users: {} \n".format(client_freq[0:20]))
     text_logs.write('train accuracy: {} test accuracy: {} final train loss: {} final test loss: {}\n\n'.format(acc_train,acc_test,loss_train,loss_test))
