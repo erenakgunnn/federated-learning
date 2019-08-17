@@ -40,7 +40,7 @@ class LocalUpdate(object):
             batch_loss = []
             for batch_idx, (images, labels) in enumerate(self.ldr_train):
                 for i in range(len(labels)):
-                    if labels[i]==0 or labels[i]==1 or labels[i]==8 or labels[i]==9:
+                    if labels[i]==6 or labels[i]==7 or labels[i]==8 or labels[i]==9:
                         labels[i]=0
                     else:
                         labels[i]=1
