@@ -5,6 +5,11 @@
 
 import numpy as np
 from torchvision import datasets, transforms
+from utils.options import args_parser
+
+
+np.random.seed(42)  #to make results reproducible
+args = args_parser()
 
 def mnist_iid(dataset, num_users):
     """
@@ -61,23 +66,47 @@ def cifar_iid(dataset, num_users):
     return dict_users
 
 def cifar_noniid(dataset, num_users):
-
-    num_shards, num_imgs = 200, 250
-    idx_shard = [i for i in range(num_shards)]
-    dict_users = {i: np.array([], dtype='int64') for i in range(num_users)}
-    idxs = np.arange(num_shards*num_imgs)
-    #labels = dataset.targets.numpy() it does not work for some reason
-    labels = np.asarray(dataset.targets, dtype=np.int32)
-    # sort labels
-    idxs_labels = np.vstack((idxs, labels))
-    idxs_labels = idxs_labels[:,idxs_labels[1,:].argsort()]
-    idxs = idxs_labels[0 , :]
-    # divide and assign
-    for i in range(num_users):
-        rand_set = set(np.random.choice(idx_shard, 2, replace=False))
-        idx_shard = list(set(idx_shard) - rand_set)
-        for rand in rand_set: 
-            dict_users[i] = np.concatenate((dict_users[i], idxs[rand*num_imgs:(rand+1)*num_imgs]), axis=0)   
+    if args.groupdata:
+        num_shards, num_imgs = 200, 250
+        idx_shard1 = [i for i in range(40)]
+        idx_shard1.extend([i for i in range(160, num_shards)])  #vehicles
+        idx_shard2 = [i for i in range(40,160)] #animals
+        dict_users = {i: np.array([], dtype='int64') for i in range(num_users)}
+        idxs = np.arange(num_shards*num_imgs)
+        #labels = dataset.targets.numpy() it does not work for some reason
+        labels = np.asarray(dataset.targets, dtype=np.int32)
+        # sort labels
+        idxs_labels = np.vstack((idxs, labels))
+        idxs_labels = idxs_labels[:,idxs_labels[1,:].argsort()]
+        idxs = idxs_labels[0 , :]
+        # divide and assign
+        for i in range(40):
+            rand_set = set(np.random.choice(idx_shard1, 2, replace=False))
+            idx_shard1 = list(set(idx_shard1) - rand_set)
+            for rand in rand_set: 
+                dict_users[i] = np.concatenate((dict_users[i], idxs[rand*num_imgs:(rand+1)*num_imgs]), axis=0)
+        for i in range(40, num_users):
+            rand_set = set(np.random.choice(idx_shard2, 2, replace=False))
+            idx_shard2 = list(set(idx_shard2) - rand_set)
+            for rand in rand_set: 
+                dict_users[i] = np.concatenate((dict_users[i], idxs[rand*num_imgs:(rand+1)*num_imgs]), axis=0)        
+    else:    
+        num_shards, num_imgs = 200, 250
+        idx_shard = [i for i in range(num_shards)]
+        dict_users = {i: np.array([], dtype='int64') for i in range(num_users)}
+        idxs = np.arange(num_shards*num_imgs)
+        #labels = dataset.targets.numpy() it does not work for some reason
+        labels = np.asarray(dataset.targets, dtype=np.int32)
+        # sort labels
+        idxs_labels = np.vstack((idxs, labels))
+        idxs_labels = idxs_labels[:,idxs_labels[1,:].argsort()]
+        idxs = idxs_labels[0 , :]
+        # divide and assign
+        for i in range(num_users):
+            rand_set = set(np.random.choice(idx_shard, 2, replace=False))
+            idx_shard = list(set(idx_shard) - rand_set)
+            for rand in rand_set: 
+                dict_users[i] = np.concatenate((dict_users[i], idxs[rand*num_imgs:(rand+1)*num_imgs]), axis=0)   
     return dict_users
 
 if __name__ == '__main__':
