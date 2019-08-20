@@ -41,7 +41,7 @@ def test_img(net_g, datatest, args):
         correct += y_pred.eq(target.data.view_as(y_pred)).long().cpu().sum()
 
     test_loss /= counter
-    accuracy = 100.00 * correct / counter
+    accuracy = 100.00 * float(correct) / float(counter)
     if args.verbose:
         print('\nTest set: Average loss: {:.4f} \nAccuracy: {}/{} ({:.2f}%)\n'.format(
             test_loss, correct,counter, accuracy))

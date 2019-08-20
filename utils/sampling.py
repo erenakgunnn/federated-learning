@@ -58,12 +58,36 @@ def cifar_iid(dataset, num_users):
     :param num_users:
     :return: dict of image index
     """
-    num_items = int(len(dataset)/num_users)
-    dict_users, all_idxs = {}, [i for i in range(len(dataset))]
-    for i in range(num_users):
-        dict_users[i] = set(np.random.choice(all_idxs, num_items, replace=False))
-        all_idxs = list(set(all_idxs) - dict_users[i])
+    if args.groupdata:
+        dict_users = {i: np.array([], dtype='int64') for i in range(num_users)}
+        idxs = np.arange(50000)
+        #labels = dataset.targets.numpy() it does not work for some reason
+        labels = np.asarray(dataset.targets, dtype=np.int32)
+        # sort labels
+        idxs_labels = np.vstack((idxs, labels))
+        idxs_labels = idxs_labels[:,idxs_labels[1,:].argsort()]
+        idxs = idxs_labels[0 , :]
+        idxs_vehicles=np.concatenate((idxs[0:10000],idxs[40000:50000]),axis=0) 
+        idxs_animals=idxs[10000:40000] 
+        np.random.shuffle(idxs_vehicles)
+        np.random.shuffle(idxs_animals)
+        for i in range(100):
+            if i<40:
+                dict_users[i] = idxs_vehicles[i*500:(i+1)*500]
+                dict_users[i] = set(dict_users[i])
+            #    print("dict users if <40: {}".format(i), dict_users[i])  
+            else:
+                dict_users[i] = set(idxs_animals[(i-40)*500:(i-39)*500])          
+    else:    
+        num_items = int(len(dataset)/num_users)
+        dict_users, all_idxs = {}, [i for i in range(len(dataset))]
+        for i in range(num_users):
+            dict_users[i] = set(np.random.choice(all_idxs, num_items, replace=False))
+            all_idxs = list(set(all_idxs) - dict_users[i])
     return dict_users
+
+
+
 
 def cifar_noniid(dataset, num_users):
     if args.groupdata:

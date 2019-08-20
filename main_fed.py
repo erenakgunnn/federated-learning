@@ -80,6 +80,7 @@ if __name__ == '__main__':
         m = max(int(args.frac * args.num_users), 1)
         idxs_users = np.random.choice(range(40), m, replace=False)
         for idx in idxs_users:
+#            print(idx,": ",dict_users[idx])
             local = LocalUpdate(args=args, dataset=dataset_train, idxs=dict_users[idx])
             w, loss = local.train(net=copy.deepcopy(net_glob).to(args.device))
             w_locals.append(copy.deepcopy(w))
@@ -106,7 +107,7 @@ if __name__ == '__main__':
     plt.plot(range(len(val_acc_list)), val_acc_list)
     plt.ylabel('test_accuracy')
     plt.xlabel("epoch")
-    plt.savefig('federated-learning/log/fed_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata))
+    plt.savefig('federated-learning/log/accuracy_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata))
 
 
 
