@@ -17,8 +17,8 @@ def test_img(net_g, datatest, args,class_0,class_1):
         test_loss = 0
         correct = 0
         data_loader = DataLoader(datatest, batch_size=args.bs)
-        l = len(data_loader)
-        counter=0
+        l = len(data_loader.dataset)
+        counter = 0
         for idx, (data, target) in enumerate(data_loader):
             positions = []
             for i in range(len(target)):
@@ -27,7 +27,7 @@ def test_img(net_g, datatest, args,class_0,class_1):
                         positions.append(i)
                         target[i]=0
                 for k in range(len(class_1)):
-                    if target[i]==class_1[j]:
+                    if target[i]==class_1[k]:
                         positions.append(i)
                         target[i]=1
             if len(positions)==0:
@@ -45,7 +45,9 @@ def test_img(net_g, datatest, args,class_0,class_1):
             # get the index of the max log-probability
             y_pred = log_probs.data.max(1, keepdim=True)[1]
             correct += y_pred.eq(target.data.view_as(y_pred)).long().cpu().sum()
-
+        print("correct: ",correct)
+        print("counter: ",counter)
+        print("testset: ",l )
         test_loss /= counter
         accuracy = 100.00 * float(correct) / float(counter)
         if args.verbose:

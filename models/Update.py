@@ -54,6 +54,7 @@ class LocalUpdate(object):
                     continue
                 images = np.asarray(images)
                 images = torch.tensor(images[positions])
+                print("images length: ",len(images))
                 labels = np.asarray(labels)
                 labels = torch.tensor(labels[positions])
                 images, labels = images.to(self.args.device), labels.to(self.args.device)

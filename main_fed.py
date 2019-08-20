@@ -68,8 +68,8 @@ if __name__ == '__main__':
     w_glob = net_glob.state_dict()
 
     #training classes
-    class_0 = [0,8]
-    class_1 = [1,9]
+    class_0 = [0,1,8,9]
+    class_1 = [2,3,4,5,6,7]
 
     # training
     loss_train = []
