@@ -23,7 +23,7 @@ if __name__ == '__main__':
     args = args_parser()
     
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
-    args.device = 'cpu'
+    #args.device = 'cpu'
     print(args.device)
     # load dataset and split users
     if args.dataset == 'mnist':
@@ -100,13 +100,13 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
-    plt.savefig('./log/fed_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata))
+    plt.savefig('federated-learning/log/fed_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata))
 
     plt.figure()
     plt.plot(range(len(val_acc_list)), val_acc_list)
     plt.ylabel('test_accuracy')
     plt.xlabel("epoch")
-    plt.savefig('./log/fed_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata))
+    plt.savefig('federated-learning/log/fed_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}.png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata))
 
 
 
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     print("Training accuracy: {}".format(acc_train))
     print("Testing accuracy: {}".format(acc_test))
     #writing to txt file
-    text_logs = open("./log/text_log.txt","a")
+    text_logs = open("federated-learning/log/text_log.txt","a")
     text_logs.write('--dataset:"{}"  model:"{}"  epochs:{}  local epochs:{}  fraciton:{}  number of user:{}  iid:{}  groupdata:{} \n'.format(args.dataset, args.model, args.epochs, args.local_ep, args.frac,args.num_users, args.iid, args.groupdata))
     text_logs.write('Accuracies during training::"{}" \n'.format(val_acc_list))
     text_logs.write('train accuracy: {} test accuracy: {} final train loss: {} final test loss: {}\n\n'.format(acc_train,acc_test,loss_train,loss_test))
