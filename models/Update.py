@@ -36,6 +36,7 @@ class LocalUpdate(object):
         # train and update
         optimizer = torch.optim.SGD(net.parameters(), lr=self.args.lr, momentum=0.5)
         epoch_loss = []
+        return_loss = None
         for iter in range(self.args.local_ep):
             batch_loss = []
             for batch_idx, (images, labels) in enumerate(self.ldr_train):
@@ -68,11 +69,14 @@ class LocalUpdate(object):
                 batch_loss.append(loss.item())
             if len(batch_loss)!=0:
                 epoch_loss.append(sum(batch_loss)/len(batch_loss))
-            if len(epoch_loss) !=0:
-                return_loss = sum(epoch_loss) / len(epoch_loss)
-            else:
-                return_loss = 0
-                
+                return_loss = None
+                break
+        if len(epoch_loss) !=0:
+            return_loss = sum(epoch_loss) / len(epoch_loss)
+
+
+
+
         return net.state_dict(), return_loss
 
 def lineer_prob(scores):

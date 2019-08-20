@@ -92,8 +92,9 @@ if __name__ == '__main__':
         for idx in idxs_users:
             local = LocalUpdate(args=args,class_0=class_0,class_1=class_1, dataset=dataset_train, idxs=dict_users[idx])
             w, loss = local.train(net=copy.deepcopy(net_glob).to(args.device))
-            w_locals.append(copy.deepcopy(w))
-            loss_locals.append(copy.deepcopy(loss))
+            if loss!=None:
+                w_locals.append(copy.deepcopy(w))
+                loss_locals.append(copy.deepcopy(loss))
         
         if args.client_momentum:
             #calculate accuracies
@@ -109,7 +110,8 @@ if __name__ == '__main__':
 
         else:
             # update global weights
-            w_glob = FedAvg(w_locals)
+            if len(w_locals) !=0:
+                w_glob = FedAvg(w_locals)
         
         # copy weight to net_glob
         net_glob.load_state_dict(w_glob)
