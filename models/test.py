@@ -10,7 +10,7 @@ import numpy as np
 import scipy.stats as sci
 
 
-def test_img(net_g, datatest, args):
+def test_img(net_g, datatest, args,class_0,class_1):
     net_g.eval()
     with torch.no_grad():
         # testing
@@ -18,7 +18,25 @@ def test_img(net_g, datatest, args):
         correct = 0
         data_loader = DataLoader(datatest, batch_size=args.bs)
         l = len(data_loader)
+        counter=0
         for idx, (data, target) in enumerate(data_loader):
+            positions = []
+            for i in range(len(target)):
+                for j in range(len(class_0)):
+                    if target[i]==class_0[j]:
+                        positions.append(i)
+                        target[i]=0
+                for k in range(len(class_1)):
+                    if target[i]==class_1[j]:
+                        positions.append(i)
+                        target[i]=1
+            if len(positions)==0:
+                continue
+            data = np.asarray(data)
+            data = torch.tensor(data[positions])
+            target = np.asarray(target)
+            target = torch.tensor(target[positions]) 
+            counter+=len(positions)          
             if args.gpu != -1:
                 data, target = data.to(args.device), target.to(args.device)
             log_probs = net_g(data)
@@ -28,11 +46,11 @@ def test_img(net_g, datatest, args):
             y_pred = log_probs.data.max(1, keepdim=True)[1]
             correct += y_pred.eq(target.data.view_as(y_pred)).long().cpu().sum()
 
-        test_loss /= len(data_loader.dataset)
-        accuracy = 100.00 * float(correct) / float(len(data_loader.dataset))
+        test_loss /= counter
+        accuracy = 100.00 * float(correct) / float(counter)
         if args.verbose:
             print('\nTest set: Average loss: {:.4f} \nAccuracy: {}/{} ({:.2f}%)\n'.format(
-                test_loss, correct, len(data_loader.dataset), accuracy))
+                test_loss, correct, counter, accuracy))
     return accuracy, test_loss
 
 def LocalAcc(args,w_locals,valid_set, net):

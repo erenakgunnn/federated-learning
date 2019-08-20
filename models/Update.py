@@ -24,21 +24,37 @@ class DatasetSplit(Dataset):
 
 
 class LocalUpdate(object):
-    def __init__(self, args, dataset=None, idxs=None):
+    def __init__(self, args,class_0,class_1, dataset=None, idxs=None):
         self.args = args
         self.loss_func = nn.CrossEntropyLoss()
         self.selected_clients = []
         self.ldr_train = DataLoader(DatasetSplit(dataset, idxs), batch_size=self.args.local_bs, shuffle=True)
-
+        self.class_0 = class_0
+        self.class_1 = class_1
     def train(self, net):
         net.train()
         # train and update
         optimizer = torch.optim.SGD(net.parameters(), lr=self.args.lr, momentum=0.5)
-
         epoch_loss = []
         for iter in range(self.args.local_ep):
             batch_loss = []
             for batch_idx, (images, labels) in enumerate(self.ldr_train):
+                positions = []
+                for i in range(len(labels)):
+                    for j in range(len(self.class_0)):
+                        if labels[i]==self.class_0[j]:
+                            positions.append(i)
+                            labels[i]=0
+                    for k in range(len(self.class_1)):
+                        if labels[i]==self.class_1[k]:
+                            positions.append(i)
+                            labels[i]=1
+                if len(positions)==0:
+                    continue
+                images = np.asarray(images)
+                images = torch.tensor(images[positions])
+                labels = np.asarray(labels)
+                labels = torch.tensor(labels[positions])
                 images, labels = images.to(self.args.device), labels.to(self.args.device)
                 net.zero_grad()
                 log_probs = net(images)
@@ -50,8 +66,14 @@ class LocalUpdate(object):
                         iter, batch_idx * len(images), len(self.ldr_train.dataset),
                                100. * batch_idx / len(self.ldr_train), loss.item()))
                 batch_loss.append(loss.item())
-            epoch_loss.append(sum(batch_loss)/len(batch_loss))
-        return net.state_dict(), sum(epoch_loss) / len(epoch_loss)
+            if len(batch_loss)!=0:
+                epoch_loss.append(sum(batch_loss)/len(batch_loss))
+            if len(epoch_loss) !=0:
+                return_loss = sum(epoch_loss) / len(epoch_loss)
+            else:
+                return_loss = 0
+                
+        return net.state_dict(), return_loss
 
 def lineer_prob(scores):
   return scores/sum(scores)

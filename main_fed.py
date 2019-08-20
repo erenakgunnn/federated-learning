@@ -67,6 +67,10 @@ if __name__ == '__main__':
     # copy weights
     w_glob = net_glob.state_dict()
 
+    #training classes
+    class_0 = [0,8]
+    class_1 = [1,9]
+
     # training
     loss_train = []
     cv_loss, cv_acc = [], []
@@ -74,7 +78,7 @@ if __name__ == '__main__':
     net_best = None
     best_loss = None
     val_acc_list, net_list = [], []
-    client_prob = [0.01]*args.num_users
+    client_prob = [1/args.num_users]*args.num_users
     client_freq = [0]*args.num_users
     client_rank = [0]*args.num_users
     
@@ -86,7 +90,7 @@ if __name__ == '__main__':
         m = max(int(args.frac * args.num_users), 1)
         idxs_users = np.random.choice(range(args.num_users), m, replace=False, p=client_prob)
         for idx in idxs_users:
-            local = LocalUpdate(args=args, dataset=dataset_train, idxs=dict_users[idx])
+            local = LocalUpdate(args=args,class_0=class_0,class_1=class_1, dataset=dataset_train, idxs=dict_users[idx])
             w, loss = local.train(net=copy.deepcopy(net_glob).to(args.device))
             w_locals.append(copy.deepcopy(w))
             loss_locals.append(copy.deepcopy(loss))
@@ -109,37 +113,38 @@ if __name__ == '__main__':
         
         # copy weight to net_glob
         net_glob.load_state_dict(w_glob)
-        acc_test, loss_test = test_img(net_glob, dataset_test, args)
+        acc_test, loss_test = test_img(net_glob, dataset_test, args,class_0,class_1)
         val_acc_list.append(acc_test)
         # print loss
         loss_avg = sum(loss_locals) / len(loss_locals)
-        print("user idxs: ",idxs_users)
-        print("user probabilities: ",client_prob)
-        print("user freqs: ", client_freq)
-        print('Round {:3d}, Average loss {:.3f}, Accuracy {}'.format(iter, loss_avg, val_acc_list[iter]))
+        if args.client_prob:
+            print("user idxs: ",idxs_users)
+            print("user probabilities: ",client_prob)
+            print("user freqs: ", client_freq)
+        print('Round {:3d}, Average loss {:.3f}, Accuracy {:.3f}'.format(iter, loss_avg, val_acc_list[iter]))
         loss_train.append(loss_avg)
 
     # plot loss curve
     plt.figure()
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
-    plt.savefig('federated-learning/log/fed_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}_ClMom{}_ClProb{}_mixed{}.png'.format(args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep,args.client_momentum,args.client_prob,args.mixed))
+    plt.savefig('./log/fed_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}_ClMom{}_ClProb{}_mixed{}.png'.format(args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep,args.client_momentum,args.client_prob,args.mixed))
     
     plt.figure()
     plt.plot(range(len(val_acc_list)), val_acc_list)
     plt.ylabel('test_accuracy')
     plt.xlabel("epoch")
-    plt.savefig('federated-learning/log/accuracy_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}_ClMom{}_ClProb{}_mixed{}.png'.format(args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep,args.client_momentum,args.client_prob,args.mixed))
+    plt.savefig('./log/accuracy_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}_ClMom{}_ClProb{}_mixed{}.png'.format(args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep,args.client_momentum,args.client_prob,args.mixed))
 
     # testing
-    acc_train, loss_train = test_img(net_glob, dataset_train, args)
-    acc_test, loss_test = test_img(net_glob, dataset_test, args)
+    acc_train, loss_train = test_img(net_glob, dataset_train, args,class_0,class_1)
+    acc_test, loss_test = test_img(net_glob, dataset_test, args,class_0,class_1)
     print("Trainingg accuracy: {}".format(acc_train))
     print("Testing accuracy: {}".format(acc_test))
     print("All test accuracies: {}".format(val_acc_list))
 
     #writing to txt file
-    text_logs = open("federated-learning/log/text_log.txt","a")
+    text_logs = open("./log/text_log.txt","a")
     text_logs.write('--dataset:"{}"  model:"{}"  epochs:{}  local epochs:{}  fraciton:{}  number of user:{}  iid:{}  client momentum:{} client prob:{} mixed:{}\n'.format(args.dataset, args.model, args.epochs, args.local_ep, args.frac,args.num_users, args.iid, args.client_momentum,args.client_prob,args.mixed))
     text_logs.write('Accuracies during training:"{}" \n'.format(val_acc_list))
     text_logs.write("Frequencies of IID users: {} \n".format(client_freq[0:20]))
