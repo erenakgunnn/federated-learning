@@ -39,13 +39,22 @@ class LocalUpdate(object):
         for iter in range(self.args.local_ep):
             batch_loss = []
             for batch_idx, (images, labels) in enumerate(self.ldr_train):
+                positions = []
                 for i in range(len(labels)):
-                    if labels[i]==0 or labels[i]==8:
+                    if labels[i]==0 or labels[i]==8 or labels[i]==1 or labels[i]==9:
                         labels[i]=0
-                    elif labels[i]==1 or labels[i]==9:
-                        labels[i]=1 
+                        positions.append(i)
+                    elif labels[i]==2 or labels[i]==3 or labels[i]==4 or labels[i]==5 or labels[i]==6 or labels[i]==7: 
+                        labels[i]=1
+                        positions.append(i)
                     else:
-                        print("Unknown label for this setup: ",labels[i])               
+                        print("Problem with data labels", labels[i], i)    
+                if len(positions) == 0:
+                    continue        
+                images = np.asarray(images)
+                labels = np.asarray(labels)
+                images = torch.tensor(images[positions])
+                labels = torch.tensor(labels[positions])
                 images, labels = images.to(self.args.device), labels.to(self.args.device)
                 net.zero_grad()
                 log_probs = net(images)
@@ -57,6 +66,9 @@ class LocalUpdate(object):
                         iter, batch_idx * len(images), len(self.ldr_train.dataset),
                                100. * batch_idx / len(self.ldr_train), loss.item()))
                 batch_loss.append(loss.item())
-            epoch_loss.append(sum(batch_loss)/len(batch_loss))
+            if len(batch_loss) != 0:    
+                epoch_loss.append(sum(batch_loss)/len(batch_loss))
+            else:
+                return net.state_dict(), "NoRelatedData"    
         return net.state_dict(), sum(epoch_loss) / len(epoch_loss)
 

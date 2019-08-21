@@ -20,10 +20,10 @@ def test_img(net_g, datatest, args):
     for idx, (data, target) in enumerate(data_loader):
         positions = []
         for i in range(len(target)):
-            if target[i]==0 or target[i]==8:
+            if target[i]==0 or target[i]==8 or target[i]==1 or target[i]==9:
                         target[i]=0
                         positions.append(i)
-            elif target[i]==1 or target[i]==9:
+            elif target[i]==2 or target[i]==3 or target[i]==4 or target[i]==5 or target[i]==6 or target[i]==7:
                         target[i]=1 
                         positions.append(i)
         data = np.asarray(data)
