@@ -37,5 +37,6 @@ def args_parser():
     parser.add_argument('--verbose', action='store_true', help='verbose print')
     parser.add_argument('--seed', type=int, default=1, help='random seed (default: 1)')
     parser.add_argument('--groupdata',  action='store_true', help='whether grouped or not')
+    parser.add_argument('--classes', type=str, default="0189-234567", help="split input for classes (-)")
     args = parser.parse_args()
     return args

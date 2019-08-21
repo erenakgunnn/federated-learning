@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 
 
-def test_img(net_g, datatest, args):
+def test_img(class00, class01, net_g, datatest, args):
     net_g.eval()
     # testing
     test_loss = 0
@@ -20,12 +20,15 @@ def test_img(net_g, datatest, args):
     for idx, (data, target) in enumerate(data_loader):
         positions = []
         for i in range(len(target)):
-            if target[i]==0 or target[i]==8 or target[i]==1 or target[i]==9:
+            if target[i] in class00:
                         target[i]=0
                         positions.append(i)
-            elif target[i]==2 or target[i]==3 or target[i]==4 or target[i]==5 or target[i]==6 or target[i]==7:
+            elif target[i] in class01:
                         target[i]=1 
                         positions.append(i)
+        if len(positions) == 0:
+            print("contt")
+            continue                
         data = np.asarray(data)
         data = torch.tensor(data[positions])
         target = np.asarray(target)

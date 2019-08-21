@@ -75,25 +75,31 @@ if __name__ == '__main__':
     best_loss = None
     val_acc_list, net_list = [], []
 
+    # virtual classes
+    classes = args.classes.split('-')
+    class0 = list(map(int,list(classes[0])))
+    class1 = list(map(int,list(classes[1])))
+
+
     for iter in range(args.epochs):
         w_locals, loss_locals = [], []
         m = max(int(args.frac * args.num_users), 1)
         idxs_users = np.random.choice(range(40), m, replace=False)
         for idx in idxs_users:
 #            print(idx,": ",dict_users[idx])
-            local = LocalUpdate(args=args, dataset=dataset_train, idxs=dict_users[idx])
+            local = LocalUpdate(class0, class1, args=args, dataset=dataset_train, idxs=dict_users[idx])
             w, loss = local.train(net=copy.deepcopy(net_glob).to(args.device))
             if loss != "NoRelatedData":
                 w_locals.append(copy.deepcopy(w))
+                loss_locals.append(copy.deepcopy(loss))
             else:
                 print("prints user idx and NoRelatedData condition",idx, loss)    
-            loss_locals.append(copy.deepcopy(loss))
         # update global weights
         w_glob = FedAvg(w_locals)
 
         # copy weight to net_glob
         net_glob.load_state_dict(w_glob)
-        acc_test, loss_test = test_img(net_glob, dataset_test, args)
+        acc_test, loss_test = test_img(class0, class1, net_glob, dataset_test, args)
         val_acc_list.append(acc_test)
         # print loss
         loss_avg = sum(loss_locals) / len(loss_locals)
@@ -115,8 +121,8 @@ if __name__ == '__main__':
 
 
     # testing
-    acc_train, loss_train = test_img(net_glob, dataset_train, args)
-    acc_test, loss_test = test_img(net_glob, dataset_test, args)
+    acc_train, loss_train = test_img(class0, class1, net_glob, dataset_train, args)
+    acc_test, loss_test = test_img(class0, class1, net_glob, dataset_test, args)
     print("Training accuracy: {}".format(acc_train))
     print("Testing accuracy: {}".format(acc_test))
     #writing to txt file

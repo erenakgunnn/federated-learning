@@ -24,11 +24,13 @@ class DatasetSplit(Dataset):
 
 
 class LocalUpdate(object):
-    def __init__(self, args, dataset=None, idxs=None):
+    def __init__(self, class00, class01, args, dataset=None, idxs=None):
         self.args = args
         self.loss_func = nn.CrossEntropyLoss()
         self.selected_clients = []
         self.ldr_train = DataLoader(DatasetSplit(dataset, idxs), batch_size=self.args.local_bs, shuffle=True)
+        self.class0 = class00
+        self.class1 = class01
 
     def train(self, net):
         net.train()
@@ -41,14 +43,12 @@ class LocalUpdate(object):
             for batch_idx, (images, labels) in enumerate(self.ldr_train):
                 positions = []
                 for i in range(len(labels)):
-                    if labels[i]==0 or labels[i]==8 or labels[i]==1 or labels[i]==9:
+                    if labels[i] in self.class0:
                         labels[i]=0
                         positions.append(i)
-                    elif labels[i]==2 or labels[i]==3 or labels[i]==4 or labels[i]==5 or labels[i]==6 or labels[i]==7: 
+                    elif labels[i] in self.class1: 
                         labels[i]=1
-                        positions.append(i)
-                    else:
-                        print("Problem with data labels", labels[i], i)    
+                        positions.append(i)  
                 if len(positions) == 0:
                     continue        
                 images = np.asarray(images)
