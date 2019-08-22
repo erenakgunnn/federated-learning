@@ -38,5 +38,7 @@ def args_parser():
     parser.add_argument('--seed', type=int, default=1, help='random seed (default: 1)')
     parser.add_argument('--groupdata',  action='store_true', help='whether grouped or not')
     parser.add_argument('--classes', type=str, default="0189-234567", help="split input for classes (-)")
+    parser.add_argument('--load_model', type=str, default="-", help="Load pre-trained model parameters")
+    parser.add_argument('--save_model', action='store_true', help="Save learned parameters of the model")
     args = parser.parse_args()
     return args

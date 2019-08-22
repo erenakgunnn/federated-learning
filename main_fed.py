@@ -62,6 +62,11 @@ if __name__ == '__main__':
     else:
         exit('Error: unrecognized model')
     print(net_glob)
+    if args.load_model != "-":
+        path = "federated-learning/pretrained_models/"+args.load_model+".pth"
+        net_glob.load_state_dict(torch.load(path))
+
+
     net_glob.train()
 
     # copy weights
@@ -107,6 +112,12 @@ if __name__ == '__main__':
         loss_train.append(loss_avg)
 
     # plot loss curve
+
+    if args.save_model :
+        path = "federated-learning/pretrained_models/"+"{}_{}.pth".format(args.classes,args.epochs)
+        torch.save(net_glob.state_dict(),path)
+        
+
     plt.figure()
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
