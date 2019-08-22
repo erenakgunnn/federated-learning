@@ -7,6 +7,7 @@ from torch import nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import numpy as np
+import copy
 
 
 def test_img(class00, class01, net_g, datatest, args):
@@ -17,7 +18,9 @@ def test_img(class00, class01, net_g, datatest, args):
     data_loader = DataLoader(datatest, batch_size=args.bs)
     l = len(data_loader)
     counter = 0
+    true_guesses = [0]*10
     for idx, (data, target) in enumerate(data_loader):
+        old_targets = copy.deepcopy(target)
         positions = []
         for i in range(len(target)):
             if target[i] in class00:
@@ -33,6 +36,10 @@ def test_img(class00, class01, net_g, datatest, args):
         data = torch.tensor(data[positions])
         target = np.asarray(target)
         target = torch.tensor(target[positions])
+
+        old_targets=np.asarray(old_targets)
+        old_targets = old_targets[positions]
+
         counter += len(positions)
         if args.gpu != -1:
             data, target = data.to(args.device), target.to(args.device)
@@ -41,8 +48,15 @@ def test_img(class00, class01, net_g, datatest, args):
         test_loss += F.cross_entropy(log_probs, target, reduction='sum').item()
         # get the index of the max log-probability
         y_pred = log_probs.data.max(1, keepdim=True)[1]
-        correct += y_pred.eq(target.data.view_as(y_pred)).long().cpu().sum()
+        correct_guess = y_pred.eq(target.data.view_as(y_pred))
 
+        #correct guesses for each label seperately
+        for i in range(len(correct_guess)):
+            if correct_guess[i]==1:
+                true_guesses[old_targets[i]] +=1
+
+        correct += correct_guess.long().cpu().sum()
+    print("correct frequencies: ",true_guesses)
     test_loss /= counter
     accuracy = 100.00 * float(correct) / float(counter)
     if args.verbose:

@@ -63,7 +63,7 @@ if __name__ == '__main__':
         exit('Error: unrecognized model')
     print(net_glob)
     if args.load_model != "-":
-        path = "federated-learning/pretrained_models/"+args.load_model+".pth"
+        path = "./pretrained_models/"+args.load_model+".pth"
         net_glob.load_state_dict(torch.load(path))
 
 
@@ -114,20 +114,20 @@ if __name__ == '__main__':
     # plot loss curve
 
     if args.save_model :
-        path = "federated-learning/pretrained_models/"+"{}_{}.pth".format(args.classes,args.epochs)
+        path = "./pretrained_models/"+"{}_{}.pth".format(args.classes,args.epochs)
         torch.save(net_glob.state_dict(),path)
         
 
     plt.figure()
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
-    plt.savefig('federated-learning/log/fed_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}_split"{}".png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata,args.classes))
+    plt.savefig('./log/fed_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}_split"{}".png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata,args.classes))
 
     plt.figure()
     plt.plot(range(len(val_acc_list)), val_acc_list)
     plt.ylabel('test_accuracy')
     plt.xlabel("epoch")
-    plt.savefig('federated-learning/log/accuracy_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}_split"{}".png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata,args.classes))
+    plt.savefig('./log/accuracy_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}_split"{}".png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata,args.classes))
 
 
 
@@ -137,7 +137,7 @@ if __name__ == '__main__':
     print("Training accuracy: {}".format(acc_train))
     print("Testing accuracy: {}".format(acc_test))
     #writing to txt file
-    text_logs = open("federated-learning/log/text_log.txt","a")
+    text_logs = open("./log/text_log.txt","a")
     text_logs.write('--dataset:"{}"  model:"{}"  epochs:{}  local epochs:{}  fraciton:{}  number of user:{}  iid:{}  groupdata:{} \n'.format(args.dataset, args.model, args.epochs, args.local_ep, args.frac,args.num_users, args.iid, args.groupdata))
     text_logs.write('Accuracies during training::"{}" \n'.format(val_acc_list))
     text_logs.write('train accuracy: {} test accuracy: {} final train loss: {} final test loss: {}\n\n'.format(acc_train,acc_test,loss_train,loss_test))
