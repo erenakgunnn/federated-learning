@@ -121,10 +121,13 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
+    plt.xlabel("epoch")
+    plt.title("Splitting: {}  Pretrained: {}".format(args.classes,args.load_model))
     plt.savefig('./log/fed_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}_split"{}".png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata,args.classes))
 
     plt.figure()
     plt.plot(range(len(val_acc_list)), val_acc_list)
+    plt.title("Splitting: {}  Pretrained: {}".format(args.classes,args.load_model))
     plt.ylabel('test_accuracy')
     plt.xlabel("epoch")
     plt.savefig('./log/accuracy_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}_split"{}".png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata,args.classes))
