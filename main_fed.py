@@ -79,7 +79,8 @@ if __name__ == '__main__':
     net_best = None
     best_loss = None
     val_acc_list, net_list = [], []
-
+    w_acc = []
+    updated_epoch=0
     # virtual classes
     classes = args.classes.split('-')
     class0 = list(map(int,list(classes[0])))
@@ -100,7 +101,20 @@ if __name__ == '__main__':
             else:
                 print("prints user idx and NoRelatedData condition",idx, loss)    
         # update global weights
-        w_glob = FedAvg(w_locals)
+
+        if args.accumulate:
+            print("len w locals: ",len(w_locals))
+            for i in w_locals:
+                w_acc.append(i)
+                if len(w_acc) == 10:
+                    w_glob = FedAvg(w_acc)
+                    w_acc = []
+                    updated_epoch+=1
+                    print("updated epoch number:",updated_epoch)
+            print("accumulated weight number: ",len(w_acc))        
+
+        else:
+            w_glob = FedAvg(w_locals)
 
         # copy weight to net_glob
         net_glob.load_state_dict(w_glob)

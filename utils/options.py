@@ -40,5 +40,6 @@ def args_parser():
     parser.add_argument('--classes', type=str, default="0189-234567", help="split input for classes (-)")
     parser.add_argument('--load_model', type=str, default="-", help="Load pre-trained model parameters")
     parser.add_argument('--save_model', action='store_true', help="Save learned parameters of the model")
+    parser.add_argument('--accumulate', action='store_true', help="Accumulate parameters of 10 clients before taking average")
     args = parser.parse_args()
     return args
