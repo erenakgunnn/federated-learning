@@ -103,7 +103,7 @@ if __name__ == '__main__':
         # update global weights
 
         if args.accumulate:
-            print("len w locals: ",len(w_locals))
+#            print("len w locals: ",len(w_locals))
             for i in w_locals:
                 w_acc.append(i)
                 if len(w_acc) == 10:
@@ -114,7 +114,7 @@ if __name__ == '__main__':
             print("accumulated weight number: ",len(w_acc))        
 
         else:
-            w_glob = FedAvg(w_locals)
+#            w_glob = FedAvg(w_locals)
 
         # copy weight to net_glob
         net_glob.load_state_dict(w_glob)
