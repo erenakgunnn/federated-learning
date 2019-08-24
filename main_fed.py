@@ -113,7 +113,6 @@ if __name__ == '__main__':
                     updated_epoch+=1
                     print("updated epoch number:",updated_epoch)
 #            print("accumulated weight number: ",len(w_acc))        
-
         else:
             w_glob = FedAvg(w_locals)
 
