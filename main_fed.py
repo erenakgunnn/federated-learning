@@ -23,7 +23,7 @@ if __name__ == '__main__':
     args = args_parser()
     
     args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
-    #args.device = 'cpu'
+    args.device = 'cpu'
     print(args.device)
     # load dataset and split users
     if args.dataset == 'mnist':
@@ -81,6 +81,7 @@ if __name__ == '__main__':
     val_acc_list, net_list = [], []
     w_acc = []
     updated_epoch=0
+    class_accuracies = []
     # virtual classes
     classes = args.classes.split('-')
     class0 = list(map(int,list(classes[0])))
@@ -90,7 +91,7 @@ if __name__ == '__main__':
     for iter in range(args.epochs):
         w_locals, loss_locals = [], []
         m = max(int(args.frac * args.num_users), 1)
-        idxs_users = np.random.choice(range(40), m, replace=False)
+        idxs_users = np.random.choice(range(100), m, replace=False)
         for idx in idxs_users:
 #            print(idx,": ",dict_users[idx])
             local = LocalUpdate(class0, class1, args=args, dataset=dataset_train, idxs=dict_users[idx])
@@ -118,7 +119,7 @@ if __name__ == '__main__':
 
         # copy weight to net_glob
         net_glob.load_state_dict(w_glob)
-        acc_test, loss_test = test_img(class0, class1, net_glob, dataset_test, args)
+        acc_test, loss_test = test_img(class_accuracies,class0, class1, net_glob, dataset_test, args)
         val_acc_list.append(acc_test)
         # print loss
         loss_avg = sum(loss_locals) / len(loss_locals)
@@ -139,6 +140,19 @@ if __name__ == '__main__':
     plt.title("Splitting: {}  Pretrained: {}".format(args.classes,args.load_model))
     plt.savefig('./log/fed_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}_split"{}".png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata,args.classes))
 
+
+    plt.figure()
+    class_accuracies = np.asarray(class_accuracies)
+    class_accuracies = class_accuracies/10
+    plt.ylabel('class accuracies')
+    plt.xlabel("epoch")
+    plt.title("Splitting: {}  Pretrained: {}".format(args.classes,args.load_model))
+    for i in range(10):
+        plt.plot(range(len(loss_train)), class_accuracies[:,i], label="class: {}".format(i) )
+    plt.legend()
+    plt.savefig('./log/class_accuracies_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}_split"{}".png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata,args.classes))
+
+
     plt.figure()
     plt.plot(range(len(val_acc_list)), val_acc_list)
     plt.title("Splitting: {}  Pretrained: {}".format(args.classes,args.load_model))
@@ -149,8 +163,9 @@ if __name__ == '__main__':
 
 
     # testing
-    acc_train, loss_train = test_img(class0, class1, net_glob, dataset_train, args)
-    acc_test, loss_test = test_img(class0, class1, net_glob, dataset_test, args)
+    class_accuracies2 = []
+    acc_train, loss_train = test_img(class_accuracies2,class0, class1, net_glob, dataset_train, args)
+    acc_test, loss_test = test_img(class_accuracies2,class0, class1, net_glob, dataset_test, args)
     print("Training accuracy: {}".format(acc_train))
     print("Testing accuracy: {}".format(acc_test))
     #writing to txt file

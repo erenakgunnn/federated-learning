@@ -10,7 +10,7 @@ import numpy as np
 import copy
 
 
-def test_img(class00, class01, net_g, datatest, args):
+def test_img(class_accuracies,class00, class01, net_g, datatest, args):
     net_g.eval()
     # testing
     test_loss = 0
@@ -57,6 +57,7 @@ def test_img(class00, class01, net_g, datatest, args):
 
         correct += correct_guess.long().cpu().sum()
     print("correct frequencies: ",true_guesses)
+    class_accuracies.append(true_guesses)
     test_loss /= counter
     accuracy = 100.00 * float(correct) / float(counter)
     if args.verbose:
