@@ -90,7 +90,7 @@ if __name__ == '__main__':
     for iter in range(args.epochs):
         w_locals, loss_locals = [], []
         m = max(int(args.frac * args.num_users), 1)
-        idxs_users = np.random.choice(range(40), m, replace=False)
+        idxs_users = np.random.choice(range(100), m, replace=False)
         for idx in idxs_users:
 #            print(idx,": ",dict_users[idx])
             local = LocalUpdate(class0, class1, args=args, dataset=dataset_train, idxs=dict_users[idx])
@@ -112,7 +112,6 @@ if __name__ == '__main__':
                     updated_epoch+=1
                     print("updated epoch number:",updated_epoch)
 #            print("accumulated weight number: ",len(w_acc))        
-
         else:
             w_glob = FedAvg(w_locals)
 
