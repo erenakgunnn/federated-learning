@@ -91,7 +91,14 @@ if __name__ == '__main__':
     for iter in range(args.epochs):
         w_locals, loss_locals = [], []
         m = max(int(args.frac * args.num_users), 1)
-        idxs_users = np.random.choice(range(100), m, replace=False)
+        if args.groupdata:
+            if args.classes=="08-19":
+                inputs=range(40)
+            elif args.classes == "247-356":
+                inputs=range(40,100)
+        else:
+            inputs = range(100)        
+        idxs_users = np.random.choice(inputs, m, replace=False)
         for idx in idxs_users:
 #            print(idx,": ",dict_users[idx])
             local = LocalUpdate(class0, class1, args=args, dataset=dataset_train, idxs=dict_users[idx])
@@ -146,10 +153,21 @@ if __name__ == '__main__':
     plt.ylabel('class accuracies')
     plt.xlabel("epoch")
     plt.title("Splitting: {}  Pretrained: {}".format(args.classes,args.load_model))
-    for i in range(10):
-        plt.plot(range(len(loss_train)), class_accuracies[:,i], label="class: {}".format(i) )
+    for i in range(len(class0)):
+        plt.plot(range(len(loss_train)), class_accuracies[:,class0[i]], label="class: {}".format(class0[i]) )
     plt.legend()
-    plt.savefig('./log/class_accuracies_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}_split"{}".png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata,args.classes))
+    plt.savefig('./log/class0_accuracies_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}_split"{}".png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata,args.classes))
+
+    plt.figure()
+    class_accuracies = np.asarray(class_accuracies)
+    class_accuracies = class_accuracies/10
+    plt.ylabel('class accuracies')
+    plt.xlabel("epoch")
+    plt.title("Splitting: {}  Pretrained: {}".format(args.classes,args.load_model))
+    for i in range(len(class1)):
+        plt.plot(range(len(loss_train)), class_accuracies[:,class1[i]], label="class: {}".format(class1[i]) )
+    plt.legend()
+    plt.savefig('./log/class1_accuracies_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}_split"{}".png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata,args.classes))
 
 
     plt.figure()
