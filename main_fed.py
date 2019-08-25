@@ -22,8 +22,7 @@ if __name__ == '__main__':
     # parse args
     args = args_parser()
     
-    args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')
-    #args.device = 'cpu'
+    args.device = torch.device('cuda:{}'.format(args.gpu) if torch.cuda.is_available() and args.gpu != -1 else 'cpu')'
     print(args.device)
     # load dataset and split users
     if args.dataset == 'mnist':
@@ -159,8 +158,6 @@ if __name__ == '__main__':
     plt.savefig('./log/class0_accuracies_{}_{}_{}_C{}_iid{}_locEp{}_groupdata{}_split"{}".png'.format(args.dataset, args.model, args.epochs, args.frac, args.iid, args.local_ep,args.groupdata,args.classes))
 
     plt.figure()
-    class_accuracies = np.asarray(class_accuracies)
-    class_accuracies = class_accuracies/10
     plt.ylabel('class accuracies')
     plt.xlabel("epoch")
     plt.title("Splitting: {}  Pretrained: {}".format(args.classes,args.load_model))
