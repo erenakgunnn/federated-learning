@@ -82,10 +82,7 @@ if __name__ == '__main__':
     updated_epoch=0
     class_accuracies = []
     # virtual classes
-    classes = args.classes.split('-')
-    class0 = list(map(int,list(classes[0])))
-    class1 = list(map(int,list(classes[1])))
-
+    class0,class1 = [],[]
 
     for iter in range(args.epochs):
         w_locals, loss_locals = [], []

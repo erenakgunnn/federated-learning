@@ -42,20 +42,6 @@ class LocalUpdate(object):
         for iter in range(self.args.local_ep):
             batch_loss = []
             for batch_idx, (images, labels) in enumerate(self.ldr_train):
-                positions = []
-                for i in range(len(labels)):
-                    if labels[i] in self.class0:
-                        labels[i]=0
-                        positions.append(i)
-                    elif labels[i] in self.class1: 
-                        labels[i]=1
-                        positions.append(i)  
-                if len(positions) == 0:
-                    continue        
-                images = np.asarray(images)
-                labels = np.asarray(labels)
-                images = torch.tensor(images[positions])
-                labels = torch.tensor(labels[positions])
                 images, labels = images.to(self.args.device), labels.to(self.args.device)
                 net.zero_grad()
                 log_probs = net(images)

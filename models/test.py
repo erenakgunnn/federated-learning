@@ -17,30 +17,8 @@ def test_img(class_accuracies,class00, class01, net_g, datatest, args):
     correct = 0
     data_loader = DataLoader(datatest, batch_size=args.bs)
     l = len(data_loader)
-    counter = 0
-    true_guesses = [0]*10
     for idx, (data, target) in enumerate(data_loader):
-        old_targets = copy.deepcopy(target)
-        positions = []
-        for i in range(len(target)):
-            if target[i] in class00:
-                        target[i]=0
-                        positions.append(i)
-            elif target[i] in class01:
-                        target[i]=1 
-                        positions.append(i)
-        if len(positions) == 0:
-            print("contt")
-            continue                
-        data = np.asarray(data)
-        data = torch.tensor(data[positions])
-        target = np.asarray(target)
-        target = torch.tensor(target[positions])
 
-        old_targets=np.asarray(old_targets)
-        old_targets = old_targets[positions]
-
-        counter += len(positions)
         if args.gpu != -1:
             data, target = data.to(args.device), target.to(args.device)
         log_probs = net_g(data)
@@ -50,16 +28,10 @@ def test_img(class_accuracies,class00, class01, net_g, datatest, args):
         y_pred = log_probs.data.max(1, keepdim=True)[1]
         correct_guess = y_pred.eq(target.data.view_as(y_pred))
 
-        #correct guesses for each label seperately
-        for i in range(len(correct_guess)):
-            if correct_guess[i]==1:
-                true_guesses[old_targets[i]] +=1
-
         correct += correct_guess.long().cpu().sum()
-    print("correct frequencies: ",true_guesses)
-    class_accuracies.append(true_guesses)
-    test_loss /= counter
-    accuracy = 100.00 * float(correct) / float(counter)
+    test_loss /= l
+    accuracy = float(correct) /100
+    print(l)
     if args.verbose:
         print('\nTest set: Average loss: {:.4f} \nAccuracy: {}/{} ({:.2f}%)\n'.format(
             test_loss, correct,counter, accuracy))
