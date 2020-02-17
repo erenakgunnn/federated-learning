@@ -35,12 +35,10 @@ class LocalUpdate(object):
         # train and update
         optimizer = torch.optim.SGD(net.parameters(), lr=self.args.lr, momentum=0.5)
         random
-        print(self.id," ",int(self.args.num_users*self.args.poisoned) )
         epoch_loss = []
         for iter in range(self.args.local_ep):
             batch_loss = []
             for batch_idx, (images, labels) in enumerate(self.ldr_train):
-                images, labels = images.to(self.args.device), labels.to(self.args.device)
                 if self.id < int(self.args.num_users*self.args.poisoned):
                     pois_labels = torch.LongTensor(10).random_(0, 10)
                     for x in range(len(pois_labels)):
@@ -49,6 +47,7 @@ class LocalUpdate(object):
                     print("labels: ",labels)
                     print("pois_labels: ", pois_labels)
                     labels = pois_labels
+                images, labels = images.to(self.args.device), labels.to(self.args.device)
                 net.zero_grad()
                 log_probs = net(images)
                 loss = self.loss_func(log_probs, labels)
