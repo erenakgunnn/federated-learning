@@ -18,12 +18,7 @@ def test_img(net_g, datatest, args):
         correct = 0
         data_loader = DataLoader(datatest, batch_size=args.bs)
         l = len(data_loader)
-        for idx, (data, target) in enumerate(data_loader):
-            for i in range(len(target)):
-                if target[i]==0 or target[i]==1 or target[i]==8 or target[i]==9:
-                    target[i]=0
-                else:
-                    target[i]=1   
+        for idx, (data, target) in enumerate(data_loader):  
             if args.gpu != -1:
                 data, target = data.to(args.device), target.to(args.device)
             log_probs = net_g(data)

@@ -39,6 +39,6 @@ def args_parser():
     parser.add_argument('--client_momentum', action='store_true', help='smart client selection with momentum')
     parser.add_argument('--client_prob', action='store_true', help='smart client selection with varying probability')
     parser.add_argument('--mixed', type=float, default=0.0, help='the ratio of the clients with IID data in NON_IID setting')  
-
+    parser.add_argument('--poisoned', type=float, default=0.0, help="the fraction of clients with posioned data")
     args = parser.parse_args()
     return args

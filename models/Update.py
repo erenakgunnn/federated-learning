@@ -39,11 +39,6 @@ class LocalUpdate(object):
         for iter in range(self.args.local_ep):
             batch_loss = []
             for batch_idx, (images, labels) in enumerate(self.ldr_train):
-                for i in range(len(labels)):
-                    if labels[i]==0 or labels[i]==1 or labels[i]==8 or labels[i]==9:
-                        labels[i]=0
-                    else:
-                        labels[i]=1
                 images, labels = images.to(self.args.device), labels.to(self.args.device)
                 net.zero_grad()
                 log_probs = net(images)
