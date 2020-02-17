@@ -86,7 +86,7 @@ if __name__ == '__main__':
         m = max(int(args.frac * args.num_users), 1)
         idxs_users = np.random.choice(range(args.num_users), m, replace=False, p=client_prob)
         for idx in idxs_users:
-            local = LocalUpdate(args=args, dataset=dataset_train, idxs=dict_users[idx])
+            local = LocalUpdate(args=args, dataset=dataset_train, idxs=dict_users[idx], id =idx)
             w, loss = local.train(net=copy.deepcopy(net_glob).to(args.device))
             w_locals.append(copy.deepcopy(w))
             loss_locals.append(copy.deepcopy(loss))
@@ -124,13 +124,13 @@ if __name__ == '__main__':
     plt.figure()
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
-    plt.savefig('./log/Newfed_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}_ClMom{}_ClProb{}_mixed{}.png'.format(args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep,args.client_momentum,args.client_prob,args.mixed))
+    plt.savefig('./log/Newfed_{}_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}_ClMom{}_ClProb{}_mixed{}.png'.format(args.poisoned, args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep,args.client_momentum,args.client_prob,args.mixed))
     
     plt.figure()
     plt.plot(range(len(val_acc_list)), val_acc_list)
     plt.ylabel('test_accuracy')
     plt.xlabel("epoch")
-    plt.savefig('./log/Newaccuracy_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}_ClMom{}_ClProb{}_mixed{}.png'.format(args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep,args.client_momentum,args.client_prob,args.mixed))
+    plt.savefig('./log/Newaccuracy_{}_{}_{}_{}_C{}_Num_users{}_iid{}_locEp{}_ClMom{}_ClProb{}_mixed{}.png'.format(args.poisoned,args.dataset, args.model, args.epochs, args.frac,args.num_users, args.iid, args.local_ep,args.client_momentum,args.client_prob,args.mixed))
 
     # testing
     acc_train, loss_train = test_img(net_glob, dataset_train, args)

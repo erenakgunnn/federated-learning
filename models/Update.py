@@ -24,22 +24,31 @@ class DatasetSplit(Dataset):
 
 
 class LocalUpdate(object):
-    def __init__(self, args, dataset=None, idxs=None):
+    def __init__(self, args, dataset=None, idxs=None ,id = None):
         self.args = args
         self.loss_func = nn.CrossEntropyLoss()
         self.selected_clients = []
         self.ldr_train = DataLoader(DatasetSplit(dataset, idxs), batch_size=self.args.local_bs, shuffle=True)
-
+        self.id = id
     def train(self, net):
         net.train()
         # train and update
         optimizer = torch.optim.SGD(net.parameters(), lr=self.args.lr, momentum=0.5)
-
+        random
+        print(self.id," ",int(self.args.num_users*self.args.poisoned) )
         epoch_loss = []
         for iter in range(self.args.local_ep):
             batch_loss = []
             for batch_idx, (images, labels) in enumerate(self.ldr_train):
                 images, labels = images.to(self.args.device), labels.to(self.args.device)
+                if self.id < int(self.args.num_users*self.args.poisoned):
+                    pois_labels = torch.LongTensor(10).random_(0, 10)
+                    for x in range(len(pois_labels)):
+                        if pois_labels[x]== labels[x]:
+                            pois_labels[x] = random.randint(labels[x]+1,labels[x]+10)%10
+                    print("labels: ",labels)
+                    print("pois_labels: ", pois_labels)
+                    labels = pois_labels
                 net.zero_grad()
                 log_probs = net(images)
                 loss = self.loss_func(log_probs, labels)
