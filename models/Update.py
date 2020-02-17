@@ -44,8 +44,6 @@ class LocalUpdate(object):
                     for x in range(len(pois_labels)):
                         if pois_labels[x]== labels[x]:
                             pois_labels[x] = random.randint(labels[x]+1,labels[x]+10)%10
-                    print("labels: ",labels)
-                    print("pois_labels: ", pois_labels)
                     labels = pois_labels
                 images, labels = images.to(self.args.device), labels.to(self.args.device)
                 net.zero_grad()
